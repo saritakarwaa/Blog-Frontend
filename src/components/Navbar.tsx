@@ -1,9 +1,9 @@
 import {Link} from "react-router-dom"
-
+import { ImBlog } from "react-icons/im";
 const Navbar=()=>{
     return (
         <nav className="flex justify-between items-center p-4 shadow-md bg-white">
-            <h1 className="text-lg font-bold"></h1>
+            <h1 className="ml-10 text-lg font-bold"><ImBlog size={30} color="#3B82F6" /> </h1>
             <ul className="flex gap-6">
                 <li><Link to="/" className="hover:text-gray-600">Home</Link></li>
                 <li><Link to="/feed" className="hover:text-gray-600">My Feed</Link></li>
