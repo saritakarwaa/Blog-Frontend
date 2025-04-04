@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { CredentialResponse } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-import AuthForm from "./AuthForm";
+import AuthForm from "../components/AuthForm";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
