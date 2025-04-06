@@ -9,6 +9,11 @@ const Auth = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const isLogin = searchParams.get("type") === "login";
+  const baseUrl =
+    import.meta.env.MODE === "development"
+      ? "http://localhost:5000"
+      : "https://blog-app-3xeq.onrender.com";
+
 
   const [formData, setFormData] = useState({
     id: "",
@@ -22,7 +27,7 @@ const Auth = () => {
 
   const handleLogin = async (data: { email: string; password: string }) => {
     try {
-      const response = await fetch("http://localhost:5000/auth/login", {
+      const response = await fetch(`${baseUrl}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -44,7 +49,7 @@ const Auth = () => {
 
   const handleSignup = async (data: { id: string; email: string; password: string }) => {
     try {
-      const response = await fetch("http://localhost:5000/auth/signup", {
+      const response = await fetch(`${baseUrl}/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,7 +74,7 @@ const Auth = () => {
       const decoded = jwtDecode(credentialResponse.credential);
       console.log("Decoded Google user", decoded);
       try {
-        const response = await fetch("http://localhost:5000/auth/google", {
+        const response = await fetch(`${baseUrl}/auth/google`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
