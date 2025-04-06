@@ -33,7 +33,7 @@ const Auth = () => {
       if (response.ok) {
         localStorage.setItem("token", result.token);
         console.log("Login successful", result);
-        navigate("/dashboard");
+        navigate("/profile");
       } else {
         alert(result.error);
       }
@@ -55,7 +55,7 @@ const Auth = () => {
       if (response.ok) {
         localStorage.setItem("token", result.token);
         console.log("Signup successful", result);
-        navigate("/dashboard");
+        navigate("/profile");
       } else {
         alert(result.error);
       }
@@ -80,7 +80,7 @@ const Auth = () => {
         if (response.ok) {
           localStorage.setItem("token", result.token);
           console.log("Google auth success", result);
-          navigate("/dashboard");
+          navigate("/profile");
         } else {
           alert(result.message);
         }
