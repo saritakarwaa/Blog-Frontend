@@ -5,7 +5,10 @@ const Navbar=()=>{
     const location=useLocation()
     const searchParams=new URLSearchParams(location.search)
     const type = searchParams.get("type");
-    const hideAuthButtons=location.pathname==='/auth' && (type === "login" || type === "signup");
+    const isAuthPage=location.pathname==='/auth' && (type === "login" || type === "signup");
+    const isProfilePage = location.pathname.startsWith("/profile");
+    const hideAuthButtons=isAuthPage || isProfilePage
+
     return (
         <nav className="flex justify-between items-center p-4 shadow-md bg-white">
             <h1 className="ml-10 text-lg font-bold"><ImBlog size={30} color="#3B82F6" /> </h1>
