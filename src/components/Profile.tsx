@@ -20,6 +20,11 @@ const Profile = () => {
     const userId=localStorage.getItem("userId")
     console.log("Token:",token)
     console.log("User Id:",userId)
+    if (!token || !userId) {
+        console.warn("No token or user ID found.");
+        setLoading(false);
+        return; // Exit early
+    }
     const fetchProfile=async()=>{
         try{
             const response=await axios.get(`http://localhost:5000/auth/${userId}/profile`,{
@@ -62,7 +67,7 @@ const Profile = () => {
 
         </div>
 
-        {user?.blogs?.length! >0 && (
+        {user?.blogs && user?.blogs.length>0 && (
             <div className="mt-8 w-full max-w-2xl mx-auto space-y-4">
                 <h3 className="text-xl font-semibold mb-2">Your Blog Posts</h3>
                 {user?.blogs.map((blog,index)=>(

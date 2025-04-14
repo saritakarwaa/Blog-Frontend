@@ -15,6 +15,10 @@ const UpdateProfile = () => {
     const fetchUser = async () => {
       const userId = localStorage.getItem("userId");
       const token = localStorage.getItem("token");
+      if (!token || !userId) {
+        console.warn("No token or user ID found.");
+        return; 
+      }
       try {
         const response = await axios.get(`http://localhost:5000/auth/${userId}/profile`, {
           headers: {
