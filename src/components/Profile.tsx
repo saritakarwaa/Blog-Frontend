@@ -15,9 +15,9 @@ const Profile = () => {
   const [loading,setLoading]=useState(true)
   const navigate=useNavigate()
   const baseUrl =
-    import.meta.env.MODE === "development"
-      ? "http://localhost:5000"
-      : "https://blog-app-3xeq.onrender.com";
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5000"
+    : "https://blog-app-3xeq.onrender.com";
 
   useEffect(()=>{
     const token=localStorage.getItem("token")
@@ -27,7 +27,7 @@ const Profile = () => {
     if (!token || !userId) {
         console.warn("No token or user ID found.");
         setLoading(false);
-        return; 
+        return; // Exit early
     }
     const fetchProfile=async()=>{
         try{
@@ -56,7 +56,7 @@ const Profile = () => {
         <div className="flex flex-col items-center">
             
             <img
-            src={`http://localhost:5000/uploads/${user?.profilePicture}`}
+            src={`${baseUrl}/uploads/${user?.profilePicture}`}
             alt="Profile"
             className="w-24 h-24 rounded-full object-cover"
             />

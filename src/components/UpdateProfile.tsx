@@ -11,9 +11,10 @@ const UpdateProfile = () => {
   const [currentProfilePictureUrl, setCurrentProfilePictureUrl] = useState("");
   const navigate=useNavigate()
   const baseUrl =
-    import.meta.env.MODE === "development"
-      ? "http://localhost:5000"
-      : "https://blog-app-3xeq.onrender.com";
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5000"
+    : "https://blog-app-3xeq.onrender.com";
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -32,7 +33,7 @@ const UpdateProfile = () => {
         setId(response.data.id);
         setEmail(response.data.email);
         console.log("PROFILE PICTURE VALUE:", response.data.profilePicture); 
-        setCurrentProfilePictureUrl(`http://localhost:5000/uploads/${response.data.profilePicture}`);
+        setCurrentProfilePictureUrl(`${baseUrl}/uploads/${response.data.profilePicture}`);
       } catch (error) {
         console.error("Failed to fetch user data", error);
       }
@@ -62,7 +63,7 @@ const UpdateProfile = () => {
       console.log(`${pair[0]}: ${pair[1]}`);
     }
     try {
-      await axios.put(`http://localhost:5000/auth/${userId}/update`, formData, {
+      await axios.put(`${baseUrl}/auth/${userId}/update`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           //"Content-Type": "multipart/form-data",
