@@ -37,8 +37,11 @@ const Auth = () => {
       const result = await response.json();
       if (response.ok) {
         localStorage.setItem("token", result.token);
+        localStorage.setItem("userId",result._id)
+        localStorage.setItem("username",result.id)
+
         console.log("Login successful", result);
-        navigate("/profile");
+        navigate(`/profile/${result._id}`);
       } else {
         alert(result.error);
       }
