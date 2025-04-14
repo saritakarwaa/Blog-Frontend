@@ -14,6 +14,10 @@ const Profile = () => {
   const [user,setUser]=useState<User | null>(null);
   const [loading,setLoading]=useState(true)
   const navigate=useNavigate()
+  const baseUrl =
+    import.meta.env.MODE === "development"
+      ? "http://localhost:5000"
+      : "https://blog-app-3xeq.onrender.com";
 
   useEffect(()=>{
     const token=localStorage.getItem("token")
@@ -23,11 +27,11 @@ const Profile = () => {
     if (!token || !userId) {
         console.warn("No token or user ID found.");
         setLoading(false);
-        return; // Exit early
+        return; 
     }
     const fetchProfile=async()=>{
         try{
-            const response=await axios.get(`http://localhost:5000/auth/${userId}/profile`,{
+            const response=await axios.get(`${baseUrl}/auth/${userId}/profile`,{
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

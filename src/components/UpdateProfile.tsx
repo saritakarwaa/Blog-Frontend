@@ -10,6 +10,10 @@ const UpdateProfile = () => {
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [currentProfilePictureUrl, setCurrentProfilePictureUrl] = useState("");
   const navigate=useNavigate()
+  const baseUrl =
+    import.meta.env.MODE === "development"
+      ? "http://localhost:5000"
+      : "https://blog-app-3xeq.onrender.com";
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -20,7 +24,7 @@ const UpdateProfile = () => {
         return; 
       }
       try {
-        const response = await axios.get(`http://localhost:5000/auth/${userId}/profile`, {
+        const response = await axios.get(`${baseUrl}/auth/${userId}/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
