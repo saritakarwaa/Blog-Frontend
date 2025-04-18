@@ -1,6 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
+import EditButton from "./EditButton"
+import DeleteButton from "./DeleteButton"
 
 interface User{
     id:string,
@@ -27,7 +29,7 @@ const Profile = () => {
     if (!token || !userId) {
         console.warn("No token or user ID found.");
         setLoading(false);
-        return; // Exit early
+        return;
     }
     const fetchProfile=async()=>{
         try{
@@ -50,7 +52,16 @@ const Profile = () => {
         fetchProfile()
     }
   },[id])
+  const handleDelete = (deletedBlogId: string) => {
+    if (!user) return;
+    setUser({
+      ...user,
+      blogs: user.blogs.filter((blog) => blog.blogId !== deletedBlogId),
+    });
+  };
   if(loading) return <p className="text-center mt-8">Loading...</p>
+
+
   return(
     <section className="mt-8">
         <div className="flex flex-col items-center">
@@ -65,10 +76,13 @@ const Profile = () => {
             <p className="text-gray-600">{user?.email}</p>
             <p className="text-sm text-gray-500 mt-1">{user?.blogs.length || 0} Blog Posts</p>
             
+            <div>
             <button
                 className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
                 onClick={() => navigate('/profile/update')}>Edit Profile</button>
-
+            <button className="ml-8 mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={()=>navigate("/create/blog")}>Create Blog</button>
+            </div>
         </div>
 
         {user?.blogs && user?.blogs.length>0 && (
@@ -82,7 +96,15 @@ const Profile = () => {
                     <p className="text-gray-700 text-sm mt-1 line-clamp-3">{blog.content}</p>
                     <p className="text-xs text-gray-400 mt-2">
                         Posted on {new Date(blog.createdAt).toLocaleDateString()}</p>
+                        <div className="flex gap-2 mt-4">
+                     
+                        <EditButton userId={user.id} blogId={blog.blogId} />
+                        <DeleteButton userId={user.id} blogId={blog.blogId} onDelete={()=> handleDelete(blog.blogId)} />
+
+      
+                        </div>
                     </div>
+                    
                 ))}
 
             </div>
