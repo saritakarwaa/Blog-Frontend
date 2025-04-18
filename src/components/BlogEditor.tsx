@@ -1,6 +1,6 @@
 import { useState, FormEvent, useEffect } from 'react'
 import axios from 'axios'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate} from 'react-router-dom'
 
 interface BlogData {
   blogId?: string;
@@ -19,6 +19,7 @@ const BlogEditor = ({ initialData,onSubmit }: BlogEditorProps) => {
   const [content, setContent] = useState<string>(initialData?.content || '')
   const [image, setImage] = useState<File | null>(null)
   const [video, setVideo] = useState<File | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
   const baseUrl =
@@ -39,9 +40,16 @@ const BlogEditor = ({ initialData,onSubmit }: BlogEditorProps) => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    if (!title.trim() || !content.trim()) {
+      setError("Title and content are required.")
+      return false
+    }
     const userId = localStorage.getItem("userId")
     const token = localStorage.getItem("token")
-
+    if (!token || !userId) {
+      console.warn("No token or user ID found.");
+      return;
+    }
     const blogData = {
       userId,
       blogId: initialData?.blogId || Math.random().toString(36).substring(2, 8), // Generate new ID if editing
@@ -88,6 +96,7 @@ const BlogEditor = ({ initialData,onSubmit }: BlogEditorProps) => {
 
   return (
     <form onSubmit={handleSubmit} className='space-y-4'>
+      {error && <div className="text-red-600">{error}</div>}
       <div>
         <label className='block font-medium'>Title</label>
         <input

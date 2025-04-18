@@ -14,6 +14,10 @@ const CreateBlog = () => {
   const handleCreate = async (blogData: any) => {
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
+    if (!token || !userId) {
+      console.warn("No token or user ID found.");
+      return;
+    }
 
     const fullData = {
       ...blogData,

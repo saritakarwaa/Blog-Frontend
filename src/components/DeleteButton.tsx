@@ -12,7 +12,10 @@ const DeleteButton = ({ userId, blogId, onDelete }: { userId: string; blogId: st
   const handleDelete = async () => {
     const confirm = window.confirm("Are you sure you want to delete this blog?");
     if (!confirm) return;
-
+    if (!token || !userId) {
+      console.warn("No token or user ID found.");
+      return;
+    }
     try {
       await axios.delete(`${baseUrl}/blogs/${userId}/${blogId}`, {
         headers: {
