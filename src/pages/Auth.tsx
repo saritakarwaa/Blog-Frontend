@@ -1,5 +1,5 @@
 // Auth.tsx (Page)
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { CredentialResponse } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
@@ -14,6 +14,36 @@ const Auth = () => {
       ? "http://localhost:5000"
       : "https://blog-app-3xeq.onrender.com";
 
+      useEffect(() => {
+        const checkExistingLogin = async () => {
+          const token = localStorage.getItem("token");
+          if (!token) return;
+      
+          try {
+            const response = await fetch(`${baseUrl}/auth/me`, {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+      
+            const result = await response.json();
+      
+            if (response.ok) {
+              console.log("Auto-login successful", result);
+              localStorage.setItem("userId", result._id);
+              localStorage.setItem("username", result.id);
+              navigate(`/profile/${result._id}`);
+            } else {
+              console.warn("Token invalid or expired");
+            }
+          } catch (err) {
+            console.error("Auto-login failed", err);
+          }
+        };
+      
+        checkExistingLogin();
+      }, []);
 
   const [formData, setFormData] = useState({
     id: "",
