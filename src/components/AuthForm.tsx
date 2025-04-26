@@ -1,6 +1,7 @@
 // AuthForm.tsx
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
-
+import axios from 'axios';
+import { toast } from 'react-toastify';
 interface AuthFormProps {
   isLogin: boolean;
   formData: {
@@ -17,6 +18,23 @@ const AuthForm = ({ isLogin, formData, onChange, onSubmit, onGoogleSuccess }: Au
   const handleGoogleError = () => {
     console.log("Google Login Failed");
   };
+  const baseUrl =
+    import.meta.env.MODE === "development"
+      ? "http://localhost:5000"
+      : "https://blog-app-3xeq.onrender.com"
+
+
+  const handleForgotPassword=async()=>{
+    try{
+      await axios.post(`${baseUrl}/auth/forgot-password`,{
+        email:formData.email,
+      })
+      toast.success("Password reset link send to your email!")
+    }
+    catch(err:any){
+      toast.error(err.response?.data?.message || "Error resetting password");
+    }
+  }
 
   return (
     <div className="flex items-center justify-center h-screen bg-gray-100">
@@ -61,6 +79,16 @@ const AuthForm = ({ isLogin, formData, onChange, onSubmit, onGoogleSuccess }: Au
             className="w-full p-2 border rounded"
             required
           />
+          {isLogin && (
+            <div className="text-right">
+              <a onClick={()=>handleForgotPassword()}
+                href="/forgot-password"
+                className="text-sm text-blue-500 hover:underline"
+              >
+                Forgot Password?
+              </a>
+            </div>
+          )}
           <button
             type="submit"
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full transition duration-300"
@@ -91,6 +119,5 @@ const AuthForm = ({ isLogin, formData, onChange, onSubmit, onGoogleSuccess }: Au
 };
 
 export default AuthForm;
-
 
   

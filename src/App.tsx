@@ -8,6 +8,7 @@ import {ToastContainer} from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css';
 import CreateBlog from "./pages/CreateBlog";
 import EditBlog from "./pages/EditBlog";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
         <Route path="/create/blog" element={<CreateBlog />}/>
         <Route path="*" element={<Navigate to="/auth?type=login" />} />
         <Route path="/profile/:userId/edit/:blogId" element={<EditBlog />} />
-
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
       <ToastContainer position="top-right" autoClose={3000} />
     </Router>
