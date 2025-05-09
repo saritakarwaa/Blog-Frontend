@@ -1,7 +1,9 @@
 // AuthForm.tsx
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+
 interface AuthFormProps {
   isLogin: boolean;
   formData: {
@@ -22,6 +24,7 @@ const AuthForm = ({ isLogin, formData, onChange, onSubmit, onGoogleSuccess }: Au
     import.meta.env.MODE === "development"
       ? "http://localhost:5000"
       : "https://blog-app-3xeq.onrender.com"
+  const navigate=useNavigate()
 
 
   const handleForgotPassword=async()=>{
@@ -30,6 +33,9 @@ const AuthForm = ({ isLogin, formData, onChange, onSubmit, onGoogleSuccess }: Au
         email:formData.email,
       })
       toast.success("Password reset link send to your email!")
+      setTimeout(() => {
+        navigate(`/reset-password/:token`); 
+      }, 1500); // Delay a bit so toast is visible
     }
     catch(err:any){
       toast.error(err.response?.data?.message || "Error resetting password");
@@ -81,12 +87,13 @@ const AuthForm = ({ isLogin, formData, onChange, onSubmit, onGoogleSuccess }: Au
           />
           {isLogin && (
             <div className="text-right">
-              <a onClick={()=>handleForgotPassword()}
-                href="/forgot-password"
+              <button
+                type="button"
+                onClick={handleForgotPassword}
                 className="text-sm text-blue-500 hover:underline"
-              >
-                Forgot Password?
-              </a>
+            >
+              Forgot Password?
+              </button>
             </div>
           )}
           <button
