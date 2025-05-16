@@ -17,8 +17,8 @@ const ResetPassword = () => {
         e.preventDefault()
         setLoading(true)
         try{
-            await axios.post(`${baseUrl}/auth/forgot-password/reset-password/${token},{
-                newPassword, }`)
+            await axios.post(`${baseUrl}/auth/forgot-password/reset-password/${token}`,{
+                newPassword, })
             toast.success("Password reset successful, Please log in.")
             navigate("/auth?type=login")
         }
