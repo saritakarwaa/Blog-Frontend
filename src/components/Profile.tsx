@@ -1,18 +1,28 @@
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate} from "react-router-dom"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import EditButton from "./EditButton"
 import DeleteButton from "./DeleteButton"
+import { toast } from "react-toastify"
+
 
 interface User{
     id:string,
     email:string,
-    blogs:any[],
+    blogs:{
+        blogId: string;
+        blogTitle: string;
+        content: string;
+        image: string | null;
+        video: string | null;
+        reaction: { likes: number; funny: number; insightful: number }[];
+        createdAt: string;
+    }[],
     profilePicture:string
 }
 
+
 const Profile = () => {
-  const {id}=useParams()
   const [user,setUser]=useState<User | null>(null);
   const [loading,setLoading]=useState(true)
   const navigate=useNavigate()
@@ -27,16 +37,14 @@ const Profile = () => {
     console.log("Token:",token)
     console.log("User Id:",userId)
     if (!token || !userId) {
-        console.warn("No token or user ID found.");
+        toast.error("No token or user ID found.");
         setLoading(false);
         return;
     }
     const fetchProfile=async()=>{
         try{
             const response=await axios.get(`${baseUrl}/auth/${userId}/profile`,{
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
+                headers: { Authorization: `Bearer ${token}`,},
             })
             console.log("User data:",response.data)
             setUser(response.data)   
@@ -48,10 +56,8 @@ const Profile = () => {
             setLoading(false)
         }
     }
-    if(userId && token){
-        fetchProfile()
-    }
-  },[id])
+    fetchProfile()
+  },[])
   const handleDelete = (deletedBlogId: string) => {
     if (!user) return;
     setUser({
@@ -67,7 +73,7 @@ const Profile = () => {
         <div className="flex flex-col items-center">
             
             <img
-            src={`${baseUrl}/uploads/${user?.profilePicture}`}
+            src={user?.profilePicture || 'https://placehold.co/96x96?text=No+Image'}
             alt="Profile"
             className="w-24 h-24 rounded-full object-cover"
             />
@@ -88,11 +94,23 @@ const Profile = () => {
         {user?.blogs && user?.blogs.length>0 && (
             <div className="mt-8 w-full max-w-2xl mx-auto space-y-4">
                 <h3 className="text-xl font-semibold mb-2">Your Blog Posts</h3>
-                {user?.blogs.map((blog,index)=>(
+                {user?.blogs.map((blog)=>(
                     <div
-                    key={index}
+                    key={blog.blogId}
                     className="border border-gray-200 rounded-lg p-4 shadow-sm">
                     <h3 className="text-lg font-semibold">{blog.blogTitle}</h3>
+                    
+                    {blog.image && ( <img
+                        src={blog.image}
+                        alt={blog.blogTitle}
+                        className="w-full max-h-64 object-cover rounded mt-2"/>
+                    )}
+                    {blog.video && (<video
+                        src={blog.video}
+                        controls
+                        className="w-full max-h-64 rounded mt-2"/>
+                    )}
+                    
                     <p className="text-gray-700 text-sm mt-1 line-clamp-3">{blog.content}</p>
                     <p className="text-xs text-gray-400 mt-2">
                         Posted on {new Date(blog.createdAt).toLocaleDateString()}</p>

@@ -1,6 +1,7 @@
 import { useState, FormEvent, useEffect } from 'react'
 import axios from 'axios'
 import { useNavigate} from 'react-router-dom'
+import { toast } from 'react-toastify';
 
 interface BlogData {
   blogId?: string;
@@ -14,7 +15,7 @@ interface BlogEditorProps {
     onSubmit: (updatedData: BlogData) => Promise<void>;
 }
 
-const BlogEditor = ({ initialData,onSubmit }: BlogEditorProps) => {
+const BlogEditor = ({ initialData}: BlogEditorProps) => {
   const [title, setTitle] = useState<string>(initialData?.blogTitle || '')
   const [content, setContent] = useState<string>(initialData?.content || '')
   const [image, setImage] = useState<File | null>(null)
@@ -32,7 +33,6 @@ const BlogEditor = ({ initialData,onSubmit }: BlogEditorProps) => {
     if (initialData) {
       setTitle(initialData.blogTitle || '')
       setContent(initialData.content || '')
-      // Optionally, set images and video if they are URLs
       setImage(null)
       setVideo(null)
     }
@@ -47,50 +47,37 @@ const BlogEditor = ({ initialData,onSubmit }: BlogEditorProps) => {
     const userId = localStorage.getItem("userId")
     const token = localStorage.getItem("token")
     if (!token || !userId) {
-      console.warn("No token or user ID found.");
+      toast.error("Please log in again.")
       return;
     }
-    const blogData = {
-      userId,
-      blogId: initialData?.blogId || Math.random().toString(36).substring(2, 8), // Generate new ID if editing
-      blogTitle: title,
-      content,
-      image,
-      video,
-      reaction: [
-        {
-          likes: 0,
-          funny: 0,
-          insightful: 0,
-        },
-      ],
-    }
+
+    const form=new FormData();
+    form.append('userId',userId)
+    form.append('blogId',initialData?.blogId || Math.random().toString(36).substring(2, 8))
+    form.append('blogTitle',title)
+    form.append('content',content)
+    form.append('reaction',JSON.stringify([{ likes: 0, funny: 0, insightful: 0 }]))
+
+
+    if(image) form.append('blogImage',image)
+    if(video) form.append('blogVideo',video)
     
     try {
-      let response;
-      if (initialData) {
-        // Update blog
-        response = await axios.put(`${baseUrl}/blogs/${userId}/${initialData.blogId}`, blogData, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          }
-        })
-      } else {
-        // Create new blog
-        response = await axios.post(`${baseUrl}/blogs`, blogData, {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          }
-        })
-      }
+       const url = initialData
+      ? `${baseUrl}/blogs/${userId}/${initialData!.blogId}` // PUT
+      : `${baseUrl}/blogs`;                                // POST
 
-      const createdBlog = response.data
-      console.log("Blog created/updated successfully")
-      navigate(`/profile/${userId}`, { state: { newBlog: createdBlog } })
+      const res = await axios({
+        method: initialData ? 'put' : 'post',
+        url,
+        data: form,
+        headers: { Authorization: `Bearer ${token}` }, // no need to set Content‑Type manually
+      });
+      console.log(initialData ? 'Blog updated successfully.' : 'Blog posted!')
+      navigate(`/profile/${userId}`, { state: { newBlog: res.data } })
     } catch (error) {
       console.log("Error creating/updating blog:", error)
+       toast.error('Server error. Please try again.')
     }
   }
 
@@ -116,7 +103,7 @@ const BlogEditor = ({ initialData,onSubmit }: BlogEditorProps) => {
         />
       </div>
       <div>
-        <label className='block font-medium'>Upload Image (optional)</label>
+        <label className='block font-medium'>Upload Image(optional)</label>
         <input
           type="file"
           onChange={(e) => setImage(e.target.files?.[0] || null)}
