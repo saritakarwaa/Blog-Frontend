@@ -11,7 +11,7 @@ const CreateBlog = () => {
       ? "http://localhost:5000"
       : "https://blog-app-3xeq.onrender.com";
 
-  const handleCreate = async (blogData: any) => {
+  const handleCreate = async (formData: FormData) => {
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
     if (!token || !userId) {
@@ -19,30 +19,32 @@ const CreateBlog = () => {
       return;
     }
 
-    const fullData = {
-      ...blogData,
-      userId,
-      blogId: Math.random().toString(36).substring(2, 8),
-      reaction: [
-        {
-          likes: 0,
-          funny: 0,
-          insightful: 0,
-        },
-      ],
-    };
-
     try {
-      const res = await axios.post(`${baseUrl}/blogs`, fullData, {
+      const response= await fetch(`${baseUrl}/blogs`, {
+        method: 'POST',
+        body: formData,
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
+          Authorization: `Bearer ${token}`
+        
+        }
+      })
+       const data = await response.json();
 
-      navigate(`/profile/${userId}`, { state: { newBlog: res.data } });
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to create blog');
+    }
+      navigate(`/profile/${userId}`, { state: { newBlog: data } });
     } catch (err) {
-      console.error("Error creating blog:", err);
+      if (axios.isAxiosError(err)) {
+        console.error("Full error:", {
+          config: err.config,
+          response: err.response?.data,
+          headers: err.response?.headers
+        });
+      } else {
+      console.error("Unknown error:", err);
+      //toast.error("Something went wrong. Try again.");
+    }
     }
   };
 

@@ -1,6 +1,6 @@
 import { useState, FormEvent, useEffect } from 'react'
-import axios from 'axios'
-import { useNavigate} from 'react-router-dom'
+// import axios from 'axios'
+// import { useNavigate} from 'react-router-dom'
 import { toast } from 'react-toastify';
 
 interface BlogData {
@@ -12,29 +12,23 @@ interface BlogData {
 }
 interface BlogEditorProps {
     initialData?: BlogData;
-    onSubmit: (updatedData: BlogData) => Promise<void>;
+    onSubmit: (formData: FormData) => Promise<void>;
 }
 
-const BlogEditor = ({ initialData}: BlogEditorProps) => {
+const BlogEditor = ({ initialData,onSubmit}: BlogEditorProps) => {
   const [title, setTitle] = useState<string>(initialData?.blogTitle || '')
   const [content, setContent] = useState<string>(initialData?.content || '')
   const [image, setImage] = useState<File | null>(null)
   const [video, setVideo] = useState<File | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const navigate = useNavigate()
-
-  const baseUrl =
-    import.meta.env.MODE === "development"
-      ? "http://localhost:5000"
-      : "https://blog-app-3xeq.onrender.com"
 
   // If editing, pre-fill the form
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.blogTitle || '')
       setContent(initialData.content || '')
-      setImage(null)
-      setVideo(null)
+      // setImage(null)
+      // setVideo(null)
     }
   }, [initialData])
 
@@ -56,28 +50,32 @@ const BlogEditor = ({ initialData}: BlogEditorProps) => {
     form.append('blogId',initialData?.blogId || Math.random().toString(36).substring(2, 8))
     form.append('blogTitle',title)
     form.append('content',content)
-    form.append('reaction',JSON.stringify([{ likes: 0, funny: 0, insightful: 0 }]))
+    //form.append('reaction',JSON.stringify([{ likes: 0, funny: 0, insightful: 0 }]))
+    form.append('reaction[0][likes]', '0');
+    form.append('reaction[0][funny]', '0');
+    form.append('reaction[0][insightful]', '0');
 
 
-    if(image) form.append('blogImage',image)
-    if(video) form.append('blogVideo',video)
     
-    try {
-       const url = initialData
-      ? `${baseUrl}/blogs/${userId}/${initialData!.blogId}` // PUT
-      : `${baseUrl}/blogs`;                                // POST
+    if (image) {
+      form.append('blogImage', image, image.name);
+    } else if (initialData?.image && !image) {
+      // If editing and no new image, keep the existing one
+      form.append('existingImage', initialData.image);
+    }
 
-      const res = await axios({
-        method: initialData ? 'put' : 'post',
-        url,
-        data: form,
-        headers: { Authorization: `Bearer ${token}` }, // no need to set Content‑Type manually
-      });
-      console.log(initialData ? 'Blog updated successfully.' : 'Blog posted!')
-      navigate(`/profile/${userId}`, { state: { newBlog: res.data } })
-    } catch (error) {
-      console.log("Error creating/updating blog:", error)
-       toast.error('Server error. Please try again.')
+    if (video) {
+      form.append('blogVideo', video, video.name);
+    } else if (initialData?.video && !video) {
+      // If editing and no new video, keep the existing one
+      form.append('existingVideo', initialData.video);
+    }
+
+     try {
+      await onSubmit(form); // Let parent handle API
+    } catch (err) {
+      console.error("Submit failed", err);
+      setError("Failed to submit blog. Please try again.");
     }
   }
 

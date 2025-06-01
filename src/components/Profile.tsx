@@ -4,12 +4,15 @@ import axios from "axios"
 import EditButton from "./EditButton"
 import DeleteButton from "./DeleteButton"
 import { toast } from "react-toastify"
+import SummarizeButton from "./SummarizeButton"
 
 
 interface User{
+    _id:string,
     id:string,
     email:string,
     blogs:{
+        _id:string;
         blogId: string;
         blogTitle: string;
         content: string;
@@ -25,6 +28,7 @@ interface User{
 const Profile = () => {
   const [user,setUser]=useState<User | null>(null);
   const [loading,setLoading]=useState(true)
+
   const navigate=useNavigate()
   const baseUrl =
   import.meta.env.MODE === "development"
@@ -65,6 +69,8 @@ const Profile = () => {
       blogs: user.blogs.filter((blog) => blog.blogId !== deletedBlogId),
     });
   };
+
+
   if(loading) return <p className="text-center mt-8">Loading...</p>
 
 
@@ -118,11 +124,12 @@ const Profile = () => {
                      
                         <EditButton userId={user.id} blogId={blog.blogId} />
                         <DeleteButton userId={user.id} blogId={blog.blogId} onDelete={()=> handleDelete(blog.blogId)} />
+                        <SummarizeButton userId={user.id} blogId={blog.blogId} />
 
-      
                         </div>
+
                     </div>
-                    
+            
                 ))}
 
             </div>

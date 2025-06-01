@@ -8,6 +8,7 @@ const EditBlog = () => {
   const { userId, blogId } = useParams<{ userId: string; blogId: string }>();
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+  
 
   const [blogData, setBlogData] = useState<any>(null);
 
@@ -36,11 +37,10 @@ const EditBlog = () => {
     fetchBlog();
   }, [userId, blogId]);
 
-  const handleUpdate = async (updatedData: any) => {
+  const handleUpdate = async (formData: FormData) => {
     try {
-      const res=await axios.put(`${baseUrl}/blogs/${userId}/${blogId}`, updatedData, {
+      const res=await axios.put(`${baseUrl}/blogs/${userId}/${blogId}`, formData, {
         headers: {
-            'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       });
